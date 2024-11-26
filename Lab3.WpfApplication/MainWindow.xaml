@@ -1,0 +1,61 @@
+﻿<Window x:Class="Lab3.WpfApplication.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lab3.WpfApplication"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:viewModels="clr-namespace:Lab3.WpfApplication.ViewModels">
+    <Window.DataContext>
+        <viewModels:MainWindowViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Orientation="Vertical">
+            <DataGrid
+                AutoGenerateColumns ="False"
+                Grid.Row="1"
+                Grid.ColumnSpan="4"
+                x:Name="LstRecipes"
+                d:ItemsSource="{d:SampleData ItemCount=3}"
+                ItemsSource="{Binding Recipes, Mode=OneWay}"
+                SelectionMode="Single"
+                CanUserAddRows="False"
+                IsReadOnly="True"
+                SelectedItem="{Binding SelectedRecipe, Mode=TwoWay}"
+                >
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Width="100" Binding="{Binding Id}"/>
+                    <DataGridTextColumn Header="Dish name" Width="300" Binding="{Binding DishName}"/>
+                    <DataGridTextColumn Header="Preparation time" Width="100" Binding="{Binding PrepTime}"/>
+                </DataGrid.Columns>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <i:InvokeCommandAction Command="{Binding SelectRecipeCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </DataGrid>
+            <Label>Ingredients:</Label>
+            <DataGrid 
+                AutoGenerateColumns ="False"
+                Grid.Row="1"
+                Grid.ColumnSpan="4"
+                x:Name="LstIngredients"
+                d:ItemsSource="{d:SampleData ItemCount=5}"
+                ItemsSource="{Binding Ingredients, Mode=OneWay}"
+                SelectionMode="Single"
+                CanUserAddRows="False"
+                IsReadOnly="True" SelectionChanged="LstIngredients_SelectionChanged"
+            >
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" Width="150" Binding="{Binding Name}"/>
+                    <DataGridTextColumn Header="Amount" Width="100" Binding="{Binding Amount}"/>
+                    <DataGridTextColumn Header="Units" Width="100" Binding="{Binding Units}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+
+    </Grid>
+</Window>
