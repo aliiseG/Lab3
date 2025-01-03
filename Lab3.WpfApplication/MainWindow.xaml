@@ -13,10 +13,13 @@
     </Window.DataContext>
     <Grid>
         <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal">
+                <Label>Recipe category:</Label>
+                <TextBox x:Name="TbxSearchCategory" Width="200" Text="{Binding SearchedRecipe, Mode=TwoWay}"/>
+                    <Button x:Name="BtnSearch" Command="{Binding SearchCommand}">Search</Button>
+            </StackPanel>
             <DataGrid
-                AutoGenerateColumns ="False"
-                Grid.Row="1"
-                Grid.ColumnSpan="4"
+                AutoGenerateColumns ="True"
                 x:Name="LstRecipes"
                 d:ItemsSource="{d:SampleData ItemCount=3}"
                 ItemsSource="{Binding Recipes, Mode=OneWay}"
@@ -28,8 +31,9 @@
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Width="100" Binding="{Binding Id}"/>
+                    <DataGridTextColumn Header="Category" Width="200" Binding="{Binding Category}"/>
                     <DataGridTextColumn Header="Dish name" Width="300" Binding="{Binding DishName}"/>
-                    <DataGridTextColumn Header="Preparation time" Width="100" Binding="{Binding PrepTime}"/>
+                    <DataGridTextColumn Header="Preparation time" Width="150" Binding="{Binding PrepTime}"/>
                 </DataGrid.Columns>
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectionChanged">

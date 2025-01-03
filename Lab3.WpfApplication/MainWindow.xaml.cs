@@ -36,5 +36,15 @@ namespace Lab3.WpfApplication
         {
 
         }
+        private void ExecuteSearch(object sender)
+        {
+            
+        }
+
+        public void button_Click(object sender, RoutedEventArgs e)
+        {
+            //string txtSearchedCategory = TbxSearchCategory.Text;
+
+        }
     }
 }
