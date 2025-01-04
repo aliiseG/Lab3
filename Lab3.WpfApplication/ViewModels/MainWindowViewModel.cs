@@ -1,15 +1,19 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Lab2.DataAccess;
 using CommunityToolkit.Mvvm.Input;
 using System.Runtime.CompilerServices;
+using System.Security.Policy;
 using System.Windows.Input;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Lab3.WpfApplication.ViewModels
 {
@@ -34,6 +38,8 @@ namespace Lab3.WpfApplication.ViewModels
             _db = new RecipeDbContext();
             SelectRecipeCommand = new RelayCommand(LoadIngredients);
             SearchCommand = new RelayCommand(FilterData);
+            ExistingCategories = new ObservableCollection<string>();
+            LoadExistingCategories();
         }
 
         /// To display recipes in first datagrid
@@ -79,16 +85,64 @@ namespace Lab3.WpfApplication.ViewModels
             }
         }
 
+        private ObservableCollection<string> _existingCategories = new ObservableCollection<string>();
+
+        public ObservableCollection<string> ExistingCategories
+        {
+            get { return _existingCategories; }
+            set
+            {
+                _existingCategories = value;
+
+            }
+        }
+
+
+
+        private void LoadExistingCategories()
+        {
+            var allCategories = _db.Recipes.Select(r => r.Category).Distinct().ToList();
+            ExistingCategories.Clear();
+            foreach (var val in allCategories)
+            {
+                ExistingCategories.Add(val);
+            }
+            ExistingCategories.Add("-");
+        }
+
+
+        private string _selectedCategory;
+        public string SelectedCategory
+        {
+            get { return _selectedCategory; }
+
+            set
+            {
+                _selectedCategory = value;
+                OnPropertyChanged();
+            }
+        }
+
         public void FilterData()
         {
 
-            if (string.IsNullOrWhiteSpace(SearchedRecipe))
+            if (string.IsNullOrWhiteSpace(SearchedRecipe) && string.IsNullOrWhiteSpace(SelectedCategory))
             {
                 _recipes = _db.Recipes.ToArray();
             }
+            else if (!string.IsNullOrWhiteSpace(SearchedRecipe) && (string.IsNullOrWhiteSpace(SelectedCategory) || SelectedCategory=="-"))
+            {
+                _recipes = _db.Recipes.Where(r => r.DishName.Contains(SearchedRecipe)).ToArray();
+                OnPropertyChanged(nameof(Recipes));
+            }
+            else if (string.IsNullOrWhiteSpace(SearchedRecipe) && !string.IsNullOrWhiteSpace(SelectedCategory))
+            {
+                _recipes = _db.Recipes.Where(r => r.Category == SelectedCategory).ToArray();
+                OnPropertyChanged(nameof(Recipes));
+            }
             else
             {
-                _recipes = _db.Recipes.Where(r => r.Category.Contains(SearchedRecipe)).ToArray();
+                _recipes = _db.Recipes.Where(r => r.DishName.Contains(SearchedRecipe) && r.Category == SelectedCategory).ToArray();
                 OnPropertyChanged(nameof(Recipes));
             }
         }

@@ -14,9 +14,23 @@
     <Grid>
         <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Orientation="Vertical">
             <StackPanel Orientation="Horizontal">
-                <Label>Recipe category:</Label>
-                <TextBox x:Name="TbxSearchCategory" Width="200" Text="{Binding SearchedRecipe, Mode=TwoWay}"/>
-                    <Button x:Name="BtnSearch" Command="{Binding SearchCommand}">Search</Button>
+                <Label>Recipe dish:</Label>
+                <TextBox x:Name="TbxSearchDishName" Width="200" Text="{Binding SearchedRecipe, Mode=TwoWay}"/>
+                <ComboBox Name="CbxSelectCategory"
+                          ItemsSource="{Binding ExistingCategories}"
+                          SelectedItem="{Binding SelectedCategory}"
+                          Text="Select category"
+                          IsEditable="true"
+                          IsReadOnly="true">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding }"></TextBlock>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button x:Name="BtnSearch" Command="{Binding SearchCommand}">Search</Button>
             </StackPanel>
             <DataGrid
                 AutoGenerateColumns ="True"
