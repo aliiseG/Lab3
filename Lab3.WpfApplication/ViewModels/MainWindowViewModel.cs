@@ -13,6 +13,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Windows.Input;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Lab3.WpfApplication.ViewModels
@@ -25,6 +26,7 @@ namespace Lab3.WpfApplication.ViewModels
         public ICommand SelectRecipeCommand { get; }
 
         public ICommand SearchCommand { get; }
+        public ICommand DeleteCommand { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -38,6 +40,7 @@ namespace Lab3.WpfApplication.ViewModels
             _db = new RecipeDbContext();
             SelectRecipeCommand = new RelayCommand(LoadIngredients);
             SearchCommand = new RelayCommand(FilterData);
+            DeleteCommand = new RelayCommand(DeleteRecipe);
             ExistingCategories = new ObservableCollection<string>();
             LoadExistingCategories();
         }
@@ -61,8 +64,12 @@ namespace Lab3.WpfApplication.ViewModels
             }
 
         }
+
+        // selected recipe from main window 
         public Recipe SelectedRecipe {get; set; }
 
+
+        // load ingredients of selected recipe
         public void LoadIngredients()
         {
             if (SelectedRecipe == null) 
@@ -72,7 +79,7 @@ namespace Lab3.WpfApplication.ViewModels
             Ingredients = _db.Ingredients.Where(m => m.Recipe.Id == SelectedRecipe.Id).ToList();
         }
 
-
+        // get input from mainwindow textbox
         private string _searchedRecipe;
         public string SearchedRecipe
         {
@@ -85,6 +92,7 @@ namespace Lab3.WpfApplication.ViewModels
             }
         }
 
+        // get all instances of distinct category values from db
         private ObservableCollection<string> _existingCategories = new ObservableCollection<string>();
 
         public ObservableCollection<string> ExistingCategories
@@ -98,7 +106,7 @@ namespace Lab3.WpfApplication.ViewModels
         }
 
 
-
+        // add all categories to combobox dropdown selection + empty value
         private void LoadExistingCategories()
         {
             var allCategories = _db.Recipes.Select(r => r.Category).Distinct().ToList();
@@ -110,7 +118,7 @@ namespace Lab3.WpfApplication.ViewModels
             ExistingCategories.Add("-");
         }
 
-
+        // get selected value from dropdown menu
         private string _selectedCategory;
         public string SelectedCategory
         {
@@ -123,6 +131,7 @@ namespace Lab3.WpfApplication.ViewModels
             }
         }
 
+        // function for filtering results, "Search" button in main window 
         public void FilterData()
         {
 
@@ -147,6 +156,27 @@ namespace Lab3.WpfApplication.ViewModels
             }
         }
 
+        // function for deleting recipe and ingredients from db, "Delete" button
+        public void DeleteRecipe(){
+            if (SelectedRecipe == null)
+            {
+                return;
+            }
+
+            var deleteIngredients = _db.Ingredients.Where(m => m.Recipe.Id == SelectedRecipe.Id).ToList();
+            foreach (var ingr in deleteIngredients)
+            {
+                _db.Ingredients.Remove(ingr);
+            }
+            _db.Recipes.Remove(SelectedRecipe);
+            _db.SaveChanges();
+
+            _recipes = _db.Recipes.ToArray();
+            OnPropertyChanged(nameof(Recipes));
+            OnPropertyChanged(nameof(Ingredients));
+        }
+
+        // initial load all recipes in database
         public void Load()
         {
             _recipes = _db.Recipes.ToArray();

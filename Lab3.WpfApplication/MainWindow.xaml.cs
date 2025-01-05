@@ -36,5 +36,7 @@ namespace Lab3.WpfApplication
         {
 
         }
+
+        
     }
 }
